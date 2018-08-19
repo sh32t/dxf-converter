@@ -1,0 +1,9 @@
+.inputNum {
+    width: 50px;
+}
+
+#canvas {
+    box-sizing: border-box;
+    border: 1px solid black;
+}
+

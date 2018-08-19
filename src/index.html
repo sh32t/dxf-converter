@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="css/layout.css">
+    <script type="text/javascript" src="js/renderer.js"></script>
+    <title>DXF変換ツール</title>
+</head>
+<body>
+    <div id="sectionFile">
+        <input id="uploadFile" type="file" accept=".dxf">
+    </div>
+    <div id="sectionConvert">
+        <span class="label">間隔</span><input id="intervalText" class="inputNum" type="text"><span class="unit">mm</span>
+        <span class="label">幅</span><input id="widthText" class="inputNum" type="text"><span class="unit">mm</span>
+        <span class="label">角度</span><input id="angleText" class="inputNum" type="text"><span class="unit">°</span>
+        <input id="convertButton" type="button" value="変換">
+    </div>
+    <div id="sectionCanvas">
+        <canvas id="canvas" width="500" height="400"></canvas>
+        <input id="exportButton" type="button" value="出力">
+    </div>
+</body>
+</html>
