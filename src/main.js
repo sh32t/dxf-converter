@@ -45,19 +45,30 @@ app.on("window-all-closed", () => {
  **************************************/
 // アップロード処理
 ipcMain.on("uploadFile", (event, filePath, fileName) => {
-    fs.copyFile(filePath, path.join(__dirname, "file", "dxf", fileName), (err) => {
-        if (err) {
-            console.log(err);
+    fs.copyFile(filePath, path.join(__dirname, "file", "dxf", fileName), (error) => {
+        if (error) {
+            console.log(error);
         }
+    });
+});
+
+// 変換処理
+ipcMain.on("convertButton", (event, setting) => {
+    let strSetting = JSON.stringify(setting);
+    let child = child_process.execFile("python", ["src/py/convert.py", strSetting], (error, stdout, stderr) => {
+        if (error) {
+            console.log(error);
+        }
+        console.log(stdout);
     });
 });
 
 // エクスポート処理
 ipcMain.on("exportButton", (event, filePath) => {
     let data = "test"
-    fs.writeFile(filePath, data, function (err) {
-        if (err) {
-            return console.log(err);
+    fs.writeFile(filePath, data, function (error) {
+        if (error) {
+            console.log(error);
         }
     });
 });

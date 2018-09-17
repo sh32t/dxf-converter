@@ -1,5 +1,5 @@
 {
-  "name": "dxfconverter",
+  "name": "dxf-converter",
   "version": "1.0.0",
   "description": "CADファイルの変換ツール",
   "main": "src/main.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "C:\\Users\\s.takubo\\source\\repos\\DxfConverter"
+    "url": "C:\\Users\\s.takubo\\source\\repos\\dxf-converter"
   },
   "author": "archileon",
   "license": "ISC",

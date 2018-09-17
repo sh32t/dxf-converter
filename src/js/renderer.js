@@ -24,6 +24,17 @@ $(function () {
         ipcRenderer.send(this.id, filePath, uploadFileName);
     });
 
+    // ファイル変換
+    $("#convertButton").click(function () {
+        let setting = {};
+        setting.interval = intValue($("#intervalText").val());
+        setting.width = intValue($("#widthText").val());
+        setting.angle = intValue($("#angleText").val());
+        setting.file = uploadFileName;
+
+        ipcRenderer.send(this.id, setting);
+    });
+
     // ファイルエクスポート
     $("#exportButton").click(function () {
         let fileName = uploadFileName.split(".")[0] + dateformat(new Date(), "_yyyyMMddHHMMss");
@@ -38,8 +49,17 @@ $(function () {
         };
         dialog.showSaveDialog(window, options, function (filePath) {
             if (filePath) {
-                ipcRenderer.send("exportButton", filePath);
+                ipcRenderer.send(this.id, filePath);
             }
         });
     });
 });
+
+
+var intValue = function (value) {
+    if (isNaN(value) || value === "" || value === null) {
+        return 0;
+    } else {
+        return parseInt(value);
+    }
+};

@@ -2,11 +2,13 @@
   "ExpandedNodes": [
     "",
     "\\src",
+    "\\src\\css",
     "\\src\\file",
     "\\src\\file\\dxf",
     "\\src\\file\\txt",
-    "\\src\\js"
+    "\\src\\js",
+    "\\src\\py"
   ],
-  "SelectedNode": "\\src\\main.js",
+  "SelectedNode": "\\src\\py\\entity.py",
   "PreviewInSolutionExplorer": false
 }
