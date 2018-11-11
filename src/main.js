@@ -55,6 +55,7 @@ ipcMain.on("uploadFile", (event, filePath, fileName) => {
 // 変換処理
 ipcMain.on("convertButton", (event, setting) => {
     let strSetting = JSON.stringify(setting);
+    console.log("convert:" + strSetting);
     let child = child_process.execFile("python", ["src/py/convert.py", strSetting], (error, stdout, stderr) => {
         if (error) {
             console.log(error);
@@ -65,6 +66,7 @@ ipcMain.on("convertButton", (event, setting) => {
 
 // エクスポート処理
 ipcMain.on("exportButton", (event, filePath) => {
+    console.log("export:" + filePath);
     let data = "test"
     fs.writeFile(filePath, data, function (error) {
         if (error) {

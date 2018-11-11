@@ -6,6 +6,7 @@ import sys
 import json
 import entity
 import copy
+import numpy
 
 # ASCIIコードでエンコーディング
 def ascii_encode_dict(data):
@@ -73,26 +74,71 @@ def extract_entities(dxf_list):
             entity_flg = True
 
         if section_flg and entity_flg:
+            # 線分
             if dxf_data == LINE:
                 mylib.add_entity(entity_list, entity_obj)
                 entity_obj = entity.Line()
-
+            # 円弧
             elif dxf_data == ARC:
                 mylib.add_entity(entity_list, entity_obj)
                 entity_obj = entity.Arc()
-
+            # 円
             elif dxf_data == CIRCLE:
                 mylib.add_entity(entity_list, entity_obj)
-
+            # セクション終了
             elif dxf_data == ENDSEC:
                 mylib.add_entity(entity_list, entity_obj)
                 section_flg = False
                 entity_flg = False
-
+            # 空白
             elif entity_obj is not None:
                 entity_obj.set_value(dxf_data)
 
     return entity_list
+
+# エンティティのソート
+def sort_entities(entity_list):
+    new_entity_list = []
+    
+    # 一つ目のエンティティを決定
+    first_entity = entity_list.pop(0)
+    new_entity_list.append(first_entity)
+
+    last_point = first_entity.e_point
+    while len(entity_list) > 0:
+        last_distance = None
+        pop_index = None
+        i = 0
+        for entity in entity_list:
+            # 始点と比較
+            next_point = entity.s_point
+            next_distance = mylib.calc_distance(last_point, next_point)
+            if last_distance == None or next_distance < last_distance:
+                last_distance = next_distance
+                pop_index = i
+
+            # 終点と比較
+            next_point = entity.e_point
+            next_distance = mylib.calc_distance(last_point, next_point)
+            if next_distance < last_distance:
+                last_distance = next_distance
+                pop_index = i
+                entity.exchange()
+
+            i += 1
+
+        last_entity = entity_list.pop(pop_index)
+        last_point = last_entity.e_point
+        new_entity_list.append(last_entity)
+
+    return new_entity_list
+
+# 座標の分割
+def divide_entities(entity_list, interval):
+    point_list = []
+    for entity in entity_list:
+        point_list.extend(entity.divide(interval))
+    return point_list
 
 
 # 設定値を取得
@@ -106,12 +152,21 @@ text_list = read_file(file_name)
 dxf_list = format_dxf(text_list)
 
 # データの解析
+print("### extract ###")
 entity_list = extract_entities(dxf_list)
-for e in entity_list:
-    print(e.s_point)
-    print(e.e_point)
+mylib.log_obj(entity_list)
 
-# データの変換
+# エンティティのソート
+print("### sort ###")
+entity_list = sort_entities(entity_list)
+mylib.log_obj(entity_list)
+
+# 座標の分割
+print("### divide ###")
 interval = setting['interval']
 width = setting['width']
 angle = setting['angle']
+point_list = divide_entities(entity_list, interval)
+mylib.log_point(point_list)
+
+
