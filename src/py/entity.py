@@ -65,12 +65,10 @@ class Line(Entity):
         self.e_point = tmp
 
     def divide(self, interval):
-        print(interval)
         point_list = []
         div_num = int(self.length() / interval)
-        len_x = self.e_point[0] - self.s_point[0]
-        len_y = self.e_point[1] - self.s_point[1]
-        print(div_num)
+        len_x = (self.e_point[0] - self.s_point[0]) / div_num
+        len_y = (self.e_point[1] - self.s_point[1]) / div_num
         for i in range(div_num):
             point_x = self.s_point[0] + len_x * i
             point_y = self.s_point[1] + len_y * i

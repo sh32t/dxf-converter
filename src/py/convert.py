@@ -140,6 +140,18 @@ def divide_entities(entity_list, interval):
         point_list.extend(entity.divide(interval))
     return point_list
 
+# ファイル出力
+def export_data(point_list):
+    point_dict = {}
+    i = 0
+    for point in point_list:
+        point_dict[i] = "(" + str(point[0]) + "," + str(point[1]) + ")"
+        i += 1
+
+    path = 'src/file/tmp.json'
+    with open(path, mode='w') as file:
+        file.write(json.dumps(point_dict))
+
 
 # 設定値を取得
 setting = get_setting()
@@ -163,10 +175,15 @@ mylib.log_obj(entity_list)
 
 # 座標の分割
 print("### divide ###")
-interval = setting['interval']
-width = setting['width']
+ratio = 1000
+interval = setting['interval'] * ratio
+width = setting['width'] * ratio
 angle = setting['angle']
 point_list = divide_entities(entity_list, interval)
 mylib.log_point(point_list)
 
+# データ出力
+print("### export ###")
+export_data(point_list)
 
+print("### completed ###")
