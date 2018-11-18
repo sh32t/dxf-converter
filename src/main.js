@@ -56,11 +56,17 @@ ipcMain.on("uploadFile", (event, filePath, fileName) => {
 ipcMain.on("convertButton", (event, setting) => {
     let strSetting = JSON.stringify(setting);
     console.log("convert:" + strSetting);
+    let json = null;
     let child = child_process.execFile("python", ["src/py/convert.py", strSetting], (error, stdout, stderr) => {
         if (error) {
             console.log(error);
         }
         console.log(stdout);
+        // 出力ファイルの読み込み
+        fs.readFile("src/file/tmp.json", "utf-8", function (error, data) {
+            json = JSON.parse(data);
+            event.sender.send("convertComplete", json);
+        });
     });
 });
 

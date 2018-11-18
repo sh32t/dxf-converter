@@ -15,6 +15,9 @@ const dialog = remote.dialog;
  **************************************/
 $(function () {
 
+    // キャンバスのセットアップ
+    Canvas.setUpCanvas();
+
     // ファイルアップロード
     var uploadFileName = ""
     $("#uploadFile").change(function () {
@@ -37,6 +40,13 @@ $(function () {
 
         // ファイル変換処理
         ipcRenderer.send(this.id, setting);
+
+        // 変換処理完了
+        ratio = numberValue($("#ratioText").val()) / 100;
+        ipcRenderer.on("convertComplete", (event, json) => {
+            Canvas.setJson(json);
+            Canvas.viewDot(ratio);
+        })
     });
 
     // ファイルエクスポート
@@ -63,6 +73,13 @@ $(function () {
             }
         });
     });
+
+    // 表示倍率変更
+    $("#ratioText").change(function () {
+        ratio = numberValue($("#ratioText").val()) / 100;
+        Canvas.viewDot(ratio);
+    });
+
 });
 
 // 整数型数値に変換
@@ -72,4 +89,58 @@ var numberValue = function (value) {
     } else {
         return parseFloat(value);
     }
+};
+
+// キャンバス
+var Canvas = {
+
+    // キャンバスのセットアップ
+    setUpCanvas: function (json, ratio) {
+        this.canvas = document.getElementById("canvas");
+        this.canvasContext = this.canvas.getContext("2d");
+        this.width = canvas.width;
+        this.height = canvas.height;
+
+        this.baseX = this.width / 2;
+        this.baseY = this.height / 2;
+        this.drawBaseLine();
+    },
+
+    setJson: function (json) {
+        this.json = json;
+    },
+
+    // 変換した座標を表示
+    viewDot: function (ratio) {
+        Canvas.allClear();
+        for (var i in this.json) {
+            Canvas.drawDot(this.json[i][0], this.json[i][1], ratio);
+        }
+    },
+
+    // 座標に点を打つ
+    drawDot: function (x, y, ratio) {
+        this.canvasContext.beginPath();
+        this.canvasContext.arc(x * ratio + this.baseX, y * ratio + this.baseY, 1, 0, Math.PI * 2, false);
+        this.canvasContext.fill();
+    },
+
+    // 基準線を描く
+    drawBaseLine: function () {
+        this.lineAToB(this.baseX, 0, this.baseX, this.height);
+        this.lineAToB(0, this.baseY, this.width, this.baseY);
+    },
+
+    // AからBへ線を描く
+    lineAToB: function (ax, ay, bx, by) {
+        this.canvasContext.beginPath();
+        this.canvasContext.moveTo(ax, ay);
+        this.canvasContext.lineTo(bx, by);
+        this.canvasContext.stroke();
+    },
+
+    allClear: function () {
+        this.canvasContext.clearRect(0, 0, this.width, this.height);
+        this.drawBaseLine();
+    },
 };

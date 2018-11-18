@@ -145,7 +145,7 @@ def export_data(point_list):
     point_dict = {}
     i = 0
     for point in point_list:
-        point_dict[i] = "(" + str(point[0]) + "," + str(point[1]) + ")"
+        point_dict[i] = [point[0], point[1]]
         i += 1
 
     path = 'src/file/tmp.json'

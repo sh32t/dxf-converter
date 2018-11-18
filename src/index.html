@@ -11,19 +11,22 @@
     </div>
     <div id="sectionConvert">
         <span class="label">ピッチ幅</span>
-        <input id="intervalText" class="inputNum" type="number" value="0.05">
+        <input id="intervalText" class="inputNum" type="number" value="0.05" step="0.01">
         <span class="unit">m</span>
-        
+
         <span class="label">経路同士の幅</span>
-        <input id="widthText" class="inputNum" type="number" value="0.0775">
+        <input id="widthText" class="inputNum" type="number" value="0.0775" step="0.0001">
         <span class="unit">m</span>
-        
+
         <span class="label">角度</span>
-        <input id="angleText" class="inputNum" type="number" value="0">
+        <input id="angleText" class="inputNum" type="number" value="0" step="1" disabled>
         <span class="unit">°</span>
-        
+
         <input id="convertButton" type="button" value="変換">
     </div>
+    <span class="label">表示倍率</span>
+    <input id="ratioText" class="inputNum" type="number" value="100" step="1">
+    <span class="unit">％</span>
     <div id="sectionCanvas">
         <canvas id="canvas" width="500" height="400"></canvas>
         <input id="exportButton" type="button" value="出力">

@@ -3,8 +3,9 @@
     "",
     "\\src",
     "\\src\\file",
-    "\\src\\py"
+    "\\src\\file\\txt",
+    "\\src\\js"
   ],
-  "SelectedNode": "\\src\\py\\convert.py",
+  "SelectedNode": "\\src\\js\\renderer.js",
   "PreviewInSolutionExplorer": false
 }
