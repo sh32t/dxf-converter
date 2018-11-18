@@ -8,8 +8,8 @@ import copy
 
 class Entity(object):
     def __init__(self):
-        self.s_point = numpy.array([0, 0])
-        self.e_point = numpy.array([0, 0])
+        self.s_point = numpy.array([0.00, 0.00])
+        self.e_point = numpy.array([0.00, 0.00])
 
     @abstractmethod
     def set_value(self, dxf_data):
@@ -27,6 +27,9 @@ class Entity(object):
     def set_end_y(self, y):
         self.e_point[1] = y
 
+    def set_div_num(self, interval):
+        self.div_num = int(self.length() / interval)
+
     @abstractmethod
     def exchange(self):
         pass
@@ -38,6 +41,15 @@ class Entity(object):
     @abstractmethod
     def length(self):
         pass
+
+    @abstractmethod
+    def nozzle_path_line(self, s_point, e_point):
+        pass
+
+    @abstractmethod
+    def nozzle_path_arc(self, line_distance):
+        pass
+
 
 class Line(Entity):
     # グループコード
@@ -64,12 +76,11 @@ class Line(Entity):
         self.s_point = self.e_point
         self.e_point = tmp
 
-    def divide(self, interval):
+    def divide(self):
         point_list = []
-        div_num = int(self.length() / interval)
-        len_x = (self.e_point[0] - self.s_point[0]) / div_num
-        len_y = (self.e_point[1] - self.s_point[1]) / div_num
-        for i in range(div_num):
+        len_x = (self.e_point[0] - self.s_point[0]) / self.div_num
+        len_y = (self.e_point[1] - self.s_point[1]) / self.div_num
+        for i in range(self.div_num):
             point_x = self.s_point[0] + len_x * i
             point_y = self.s_point[1] + len_y * i
             point_list.append(numpy.array([point_x, point_y]))
@@ -78,6 +89,10 @@ class Line(Entity):
 
     def length(self):
         return mylib.calc_distance(self.s_point, self.e_point)
+
+    def nozzle_path_line(self, s_point, e_point):
+        self.s_point = s_point
+        self.e_point = e_point
 
 class Arc(Entity):
     # グループコード
@@ -131,12 +146,11 @@ class Arc(Entity):
         self.e_angle = tmp
         self.calc_arc_point()
 
-    def divide(self, interval):
+    def divide(self):
         point_list = []
-        div_num = int(self.length() / interval)
-        div_angle = numpy.absolute(self.e_angle - self.s_angle) / div_num
+        div_angle = numpy.absolute(self.e_angle - self.s_angle) / self.div_num
 
-        for i in range(div_num):
+        for i in range(self.div_num):
             angle = self.s_angle + div_angle * i
             point_list.append(self.get_arc_point(self.c_point, self.radius, angle))
 
@@ -162,6 +176,11 @@ class Arc(Entity):
         x = point[0] + radius * cos
         y = point[1] + radius * sin
         return numpy.array([x, y])
+
+    def nozzle_path_arc(self, line_distance):
+        self.radius = self.radius + line_distance
+        self.calc_arc_point()
+
 
 # TODO 必要になったら実装
 class Circle(Entity):

@@ -8,22 +8,36 @@ import entity
 import copy
 import numpy
 
+# 設定
+test_flg = False
+ratio = 1000
+
 # ASCIIコードでエンコーディング
 def ascii_encode_dict(data):
     ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
     return dict(map(ascii_encode, pair) for pair in data.items())
 
 # 設定値の取得
-def get_setting():
-    setting = json.loads(sys.argv[1], object_hook=ascii_encode_dict)
+def get_setting(test_flg):
+    arg = None
+    if test_flg:
+        arg = '{"angle":0,"file":"track.dxf","interval":0.05,"width":0.0775}'
+    else:
+        arg = sys.argv[1]
+    setting = json.loads(arg, object_hook=ascii_encode_dict)
     return setting
+    
 
 # ファイルの読み込み
-def read_file(file_name):
+def read_file(file_name, test_flg):
     # ファイルを開く
     os_path = os.getcwd()
     dir_path = r'/src/file/dxf/'
-    read_file = open(os_path + dir_path + file_name)
+    read_file= None
+    if test_flg:
+        read_file = open("../file/dxf/" + file_name)
+    else:
+        read_file = open(os_path + dir_path + file_name)
 
     # 一行ずつリスト型に格納
     text_list = list()
@@ -98,6 +112,7 @@ def extract_entities(dxf_list):
 
 # エンティティのソート
 def sort_entities(entity_list):
+
     new_entity_list = []
     
     # 一つ目のエンティティを決定
@@ -133,32 +148,60 @@ def sort_entities(entity_list):
 
     return new_entity_list
 
+# 分割数の計算
+def div_num_entities(entity_list, interval):
+    for entity in entity_list:
+        entity.set_div_num(interval)
+
+
 # 座標の分割
-def divide_entities(entity_list, interval):
+def divide_entities(entity_list):
     point_list = []
     for entity in entity_list:
-        point_list.extend(entity.divide(interval))
+        point_list.extend(entity.divide())
     return point_list
 
+# ノズル経路の取得
+def get_nozzle_path(entity_list, line_distance):
+    nozzle_entity_list = copy.deepcopy(entity_list)
+    s_point = None
+    for nozzle_entity in nozzle_entity_list:
+        nozzle_entity.nozzle_path_arc(line_distance)
+        s_point = nozzle_entity.e_point
+
+    i = 0
+    for nozzle_entity in nozzle_entity_list:
+        if i < len(nozzle_entity_list) - 1:
+            e_point = nozzle_entity_list[i + 1].s_point
+            nozzle_entity.nozzle_path_line(s_point, e_point)
+            s_point = nozzle_entity_list[i].e_point
+        else:
+            e_point = nozzle_entity_list[0].s_point
+            nozzle_entity.nozzle_path_line(s_point, e_point)
+
+        i += 1
+
+    return nozzle_entity_list
+
 # ファイル出力
-def export_data(point_list):
+def export_data(point_list, file_name):
     point_dict = {}
     i = 0
     for point in point_list:
         point_dict[i] = [point[0], point[1]]
         i += 1
 
-    path = 'src/file/tmp.json'
+    path = 'src/file/' + file_name
     with open(path, mode='w') as file:
         file.write(json.dumps(point_dict))
 
 
 # 設定値を取得
-setting = get_setting()
+setting = get_setting(test_flg)
 
 # ファイルの読み込み
 file_name = setting['file']
-text_list = read_file(file_name)
+text_list = read_file(file_name, test_flg)
 
 # DXFデータにフォーマット
 dxf_list = format_dxf(text_list)
@@ -173,17 +216,30 @@ print("### sort ###")
 entity_list = sort_entities(entity_list)
 mylib.log_obj(entity_list)
 
+# 分割数の計算
+interval = setting["interval"] * ratio
+div_num_entities(entity_list, interval)
+
+# ノズル経路の取得
+print("### nozzle_path ###")
+line_distance = setting["width"] * ratio
+entity_list_out = get_nozzle_path(entity_list, line_distance)
+entity_list_in = get_nozzle_path(entity_list, -line_distance)
+mylib.log_obj(entity_list_out)
+mylib.log_obj(entity_list_in)
+
 # 座標の分割
 print("### divide ###")
-ratio = 1000
-interval = setting['interval'] * ratio
-width = setting['width'] * ratio
-angle = setting['angle']
-point_list = divide_entities(entity_list, interval)
+angle = setting["angle"]
+point_list = divide_entities(entity_list)
+point_list_out = divide_entities(entity_list_out)
+point_list_in = divide_entities(entity_list_in)
 mylib.log_point(point_list)
 
 # データ出力
 print("### export ###")
-export_data(point_list)
+export_data(point_list, "center.json")
+export_data(point_list_out, "out.json")
+export_data(point_list_in, "in.json")
 
 print("### completed ###")

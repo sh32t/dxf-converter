@@ -43,8 +43,16 @@ $(function () {
 
         // ïœä∑èàóùäÆóπ
         ratio = numberValue($("#ratioText").val()) / 100;
-        ipcRenderer.on("convertComplete", (event, json) => {
-            Canvas.setJson(json);
+        ipcRenderer.on("centerJson", (event, json) => {
+            Canvas.setCenterJson(json);
+            Canvas.viewDot(ratio);
+        })
+        ipcRenderer.on("outJson", (event, json) => {
+            Canvas.setOutJson(json);
+            Canvas.viewDot(ratio);
+        })
+        ipcRenderer.on("inJson", (event, json) => {
+            Canvas.setInJson(json);
             Canvas.viewDot(ratio);
         })
     });
@@ -106,15 +114,29 @@ var Canvas = {
         this.drawBaseLine();
     },
 
-    setJson: function (json) {
-        this.json = json;
+    setCenterJson: function (json) {
+        this.centerJson = json;
+    },
+
+    setOutJson: function (json) {
+        this.outJson = json;
+    },
+
+    setInJson: function (json) {
+        this.inJson = json;
     },
 
     // ïœä∑ÇµÇΩç¿ïWÇï\é¶
     viewDot: function (ratio) {
         Canvas.allClear();
-        for (var i in this.json) {
-            Canvas.drawDot(this.json[i][0], this.json[i][1], ratio);
+        for (var i in this.centerJson) {
+            Canvas.drawDot(this.centerJson[i][0], this.centerJson[i][1], ratio);
+        }
+        for (var i in this.outJson) {
+            Canvas.drawDot(this.outJson[i][0], this.outJson[i][1], ratio);
+        }
+        for (var i in this.inJson) {
+            Canvas.drawDot(this.inJson[i][0], this.inJson[i][1], ratio);
         }
     },
 

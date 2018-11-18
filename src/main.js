@@ -63,9 +63,17 @@ ipcMain.on("convertButton", (event, setting) => {
         }
         console.log(stdout);
         // 出力ファイルの読み込み
-        fs.readFile("src/file/tmp.json", "utf-8", function (error, data) {
+        fs.readFile("src/file/center.json", "utf-8", function (error, data) {
             json = JSON.parse(data);
-            event.sender.send("convertComplete", json);
+            event.sender.send("centerJson", json);
+        });
+        fs.readFile("src/file/out.json", "utf-8", function (error, data) {
+            json = JSON.parse(data);
+            event.sender.send("outJson", json);
+        });
+        fs.readFile("src/file/in.json", "utf-8", function (error, data) {
+            json = JSON.parse(data);
+            event.sender.send("inJson", json);
         });
     });
 });

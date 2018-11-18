@@ -3,9 +3,11 @@
     "",
     "\\src",
     "\\src\\file",
+    "\\src\\file\\dxf",
     "\\src\\file\\txt",
-    "\\src\\js"
+    "\\src\\js",
+    "\\src\\py"
   ],
-  "SelectedNode": "\\src\\js\\renderer.js",
+  "SelectedNode": "\\src\\py\\convert.py",
   "PreviewInSolutionExplorer": false
 }
